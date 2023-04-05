@@ -254,81 +254,67 @@ void rbtree_transplant(rbtree *t, node_t *u, node_t *v){
 // case 3: x의 형제 w는 흑색, w의 왼쪽 자식은 적색, w의 오른쪽 자식은 흑색
 // case 4: x의 형제 w는 흑색이고 w의 오른쪽 자식은 적색
 
-void rbtree_delete_fixup(rbtree *t, node_t *x){
-   while (x != t->root && x->color == RBTREE_BLACK) {
-    // CASE 1 ~ 4 : LEFT CASE
+void rbtree_erase_fixup(rbtree *t, node_t *x){
+  node_t *w;
+  while (x!= t->root && x->color == RBTREE_BLACK){
+    // case 1-4
     if (x == x->parent->left){
-      node_t *w = x->parent->right;
-      
-      // CASE 1 : x의 형제 w가 적색인 경우
+      w = x->parent->right;
+      // case 1
       if (w->color == RBTREE_RED){
-        w->color = RBTREE_BLACK;
-        x->parent->color = RBTREE_RED;
-        rotate_left(t, x->parent);
-        w = x->parent->right;
+        w->color = RBTREE_BLACK;                    // case 1
+        x->parent->color = RBTREE_RED;              // case 1
+        rotate_left(t,x->parent);                   // case 1
+        w = x->parent->right;                       // case 1
       }
 
-      // CASE 2 : x의 형제 w는 흑색이고 w의 두 지식이 모두 흑색인 경우
       if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK) {
-        w->color = RBTREE_RED;
-        x = x->parent;
+        w->color = RBTREE_RED;                      // case 2
+        x = x->parent;                              // case 2
       }
 
-      // CASE 3 : x의 형제 w는 흑색, w의 왼쪽 자식은 적색, w의 오른쪽 자신은 흑색인 경우
-      else{ 
-        if (w->right->color == RBTREE_BLACK) {
-            w->left->color = RBTREE_BLACK;
-            w->color = RBTREE_RED;
-            rotate_right(t, w);
-            w = x->parent->right;
+      else {
+        if (w->right->color == RBTREE_BLACK){
+          w->left->color = RBTREE_BLACK;            // case 3
+          w->color = RBTREE_RED;                    // case 3
+          rotate_right(t,w);                        // case 3
+          w = x->parent->right;                     // case 3
         }
-
-        // CASE 4 : x의 형제 w는 흑색이고 w의 오른쪽 자식은 적색인 경우
-        w->color = x->parent->color;
-        x->parent->color = RBTREE_BLACK;
-        w->right->color = RBTREE_BLACK;
-        rotate_left(t, x->parent);
-        x = t->root;
+        w->color = x->parent->color;                // case 4              
+        x->parent->color = RBTREE_BLACK;            // case 4   
+        w->right->color = RBTREE_BLACK;             // case 4   
+        rotate_left(t,x->parent);                   // case 4   
+        x = t->root;                                // case 4    
       }
     }
-    // CASE 5 ~ 8 : RIGHT CASE
-    else {
-      node_t *w = x->parent->left;
+    else{
+      w = x->parent->left;
 
-      // CASE 5 : x의 형제 w가 적색인 경우
       if (w->color == RBTREE_RED){
         w->color = RBTREE_BLACK;
         x->parent->color = RBTREE_RED;
-        rotate_right(t, x->parent);
+        rotate_right(t,x->parent);
         w = x->parent->left;
       }
-
-      // CASE 6 : x의 형제 w는 흑색이고 w의 두 지식이 모두 흑색인 경우
       if (w->right->color == RBTREE_BLACK && w->left->color == RBTREE_BLACK) {
         w->color = RBTREE_RED;
         x = x->parent;
       }
-
-      // CASE 7 : x의 형제 w는 흑색, w의 왼쪽 자식은 적색, w의 오른쪽 자신은 흑색인 경우
-      else 
-      {
-          if (w->left->color == RBTREE_BLACK) {
-            w->right->color = RBTREE_BLACK;
-            w->color = RBTREE_RED;
-            rotate_left(t, w);
-            w = x->parent->left;
-            }
-
-        // CASE 8 : x의 형제 w는 흑색이고 w의 오른쪽 자식은 적색인 경우
+      else {
+        if (w->left->color == RBTREE_BLACK){
+          w->right->color = RBTREE_BLACK;
+          w->color = RBTREE_RED;
+          rotate_left(t,w);
+          w = x->parent->left;
+        }
         w->color = x->parent->color;
         x->parent->color = RBTREE_BLACK;
         w->left->color = RBTREE_BLACK;
-        rotate_right(t, x->parent);
+        rotate_right(t,x->parent);
         x = t->root;
       }
     }
   }
-
   x->color = RBTREE_BLACK;
 }
 
@@ -375,7 +361,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   }
 
   if (y_original_color == RBTREE_BLACK){
-    rbtree_delete_fixup(t, x);
+    rbtree_erase_fixup(t, x);
   }
 
   free(p);
